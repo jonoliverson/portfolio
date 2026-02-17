@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jon Oliverson | eLearning & Training Specialist</title>
+  <meta name="description" content="Portfolio of interactive eLearning and training projects (Storyline 360)." />
+
+  <style>
+    :root{
+      --accent:#299acc;
+      --bg:#f7fafc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --border:#e2e8f0;
+      --shadow: 0 10px 30px rgba(2, 6, 23, .08);
+      --radius: 18px;
+      --max: 1080px;
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 500px at 20% 0%, rgba(41,154,204,.18), transparent 60%),
+        radial-gradient(900px 500px at 80% 10%, rgba(41,154,204,.12), transparent 55%),
+        var(--bg);
+      line-height:1.45;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width:var(--max); margin:0 auto; padding:28px 18px 56px; }
+
+    /* Header */
+    .top{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:22px;
+    }
+
+    .brand{
+      display:flex;
+      gap:16px;
+      align-items:center;
+      min-width: 280px;
+    }
+
+    .headshot{
+      width:76px; height:76px;
+      border-radius:50%;
+      border:3px solid rgba(41,154,204,.35);
+      box-shadow: 0 8px 20px rgba(2,6,23,.10);
+      object-fit:cover;
+      background:#fff;
+    }
+
+    .title h1{
+      margin:0;
+      font-size:1.25rem;
+      letter-spacing:-0.02em;
+    }
+    .title p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-weight:600;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.75);
+      backdrop-filter: blur(6px);
+      border-radius:999px;
+      box-shadow: 0 6px 16px rgba(2,6,23,.06);
+      color:var(--muted);
+      font-weight:700;
+      font-size:.95rem;
+    }
+
+    .chip strong{ color:var(--text); }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background:var(--accent);
+      box-shadow: 0 0 0 4px rgba(41,154,204,.18);
+    }
+
+    /* Hero */
+    .hero{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:18px;
+      align-items:stretch;
+      margin: 18px 0 26px;
+    }
+
+    .heroCard{
+      background:rgba(255,255,255,.72);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:18px 18px;
+      backdrop-filter: blur(8px);
+    }
+
+    .heroCard h2{
+      margin:0 0 8px;
+      font-size:1.6rem;
+      letter-spacing:-0.03em;
+    }
+
+    .heroCard p{
+      margin:0;
+      color:var(--muted);
+      font-size:1.05rem;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      height:100%;
+    }
+
+    .stat{
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding:14px 14px;
+      box-shadow: 0 8px 18px rgba(2,6,23,.06);
+    }
+    .stat .k{
+      font-weight:900;
+      font-size:1.05rem;
+      letter-spacing:-0.01em;
+    }
+    .stat .v{
+      margin-top:6px;
+      color:var(--muted);
+      font-weight:700;
+      font-size:.95rem;
+    }
+
+    /* Grid */
+    .sectionTitle{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+      margin: 10px 0 12px;
+    }
+    .sectionTitle h3{
+      margin:0;
+      font-size:1.15rem;
+      letter-spacing:-0.01em;
+    }
+    .sectionTitle span{
+      color:var(--muted);
+      font-weight:700;
+      font-size:.95rem;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:16px;
+    }
+
+    .card{
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height: 280px;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 18px 44px rgba(2,6,23,.10);
+    }
+
+    .thumb{
+      height:110px;
+      background:
+        linear-gradient(135deg, rgba(41,154,204,.22), rgba(41,154,204,.06)),
+        radial-gradient(500px 120px at 20% 0%, rgba(41,154,204,.18), transparent 65%),
+        #ffffff;
+      border-bottom:1px solid var(--border);
+      position:relative;
+    }
+    .badge{
+      position:absolute;
+      top:12px; left:12px;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(41,154,204,.25);
+      background: rgba(41,154,204,.10);
+      font-weight:900;
+      color:#0b4d66;
+      letter-spacing:.02em;
+      font-size:.85rem;
+    }
+
+    .content{ padding:16px 16px 14px; flex:1; display:flex; flex-direction:column; gap:10px;}
+    .content h4{ margin:0; font-size:1.08rem; letter-spacing:-0.01em;}
+    .content p{ margin:0; color:var(--muted); font-weight:600; }
+
+    .meta{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:auto;
+    }
+    .pill{
+      border:1px solid var(--border);
+      color: var(--muted);
+      background:#f8fafc;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:.82rem;
+      font-weight:800;
+    }
+
+    .buttons{
+      display:flex;
+      gap:10px;
+      padding: 0 16px 16px;
+    }
+
+    .btn{
+      flex:1;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:11px 12px;
+      border-radius: 12px;
+      border:1px solid var(--border);
+      background:#ffffff;
+      font-weight:900;
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      user-select:none;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(41,154,204,.45);
+      background: rgba(41,154,204,.06);
+    }
+
+    .btnPrimary{
+      border-color: rgba(41,154,204,.45);
+      background: linear-gradient(180deg, rgba(41,154,204,.16), rgba(41,154,204,.06));
+    }
+
+    footer{
+      margin-top:28px;
+      color: var(--muted);
+      font-weight:700;
+      font-size:.95rem;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    footer a{ color: var(--accent); font-weight:900; }
+
+    /* Responsive */
+    @media (max-width: 940px){
+      .hero{ grid-template-columns: 1fr; }
+      .grid{ grid-template-columns: 1fr; }
+      .top{ flex-direction:column; align-items:flex-start; }
+      .actions{ justify-content:flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- Top bar -->
+    <div class="top">
+      <div class="brand">
+        <!-- Replace with your actual photo path -->
+        <img class="headshot" src="assets/headshot.jpg" alt="Headshot of Jon Oliverson" />
+        <div class="title">
+          <h1>Jon Oliverson</h1>
+          <p>eLearning &amp; Training Specialist</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <!-- Replace these with your real links -->
+        <a class="chip" href="#" aria-label="LinkedIn link">
+          <span class="dot"></span>
+          <strong>LinkedIn</strong>
+        </a>
+        <a class="chip" href="#" aria-label="Email link">
+          <span class="dot"></span>
+          <strong>Email</strong>
+        </a>
+        <a class="chip" href="#" aria-label="Download resume">
+          <span class="dot"></span>
+          <strong>Resume</strong>
+        </a>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="heroCard">
+        <h2>Interactive training built for real-world performance.</h2>
+        <p>
+          I design scenario-based learning, software simulations, and compliance training that moves beyond “click next”
+          and reinforces confident on-the-job behavior.
+        </p>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="k">3 Portfolio Courses</div>
+          <div class="v">Scenario • Systems • Compliance</div>
+        </div>
+        <div class="stat">
+          <div class="k">Tooling</div>
+          <div class="v">Storyline 360 • Adobe CC</div>
+        </div>
+        <div class="stat">
+          <div class="k">Design Style</div>
+          <div class="v">Modern UI • Clear feedback</div>
+        </div>
+        <div class="stat">
+          <div class="k">Focus</div>
+          <div class="v">Behavior change &amp; practice</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="sectionTitle">
+      <h3>Featured Work</h3>
+      <span>Launch the demo or view the case study.</span>
+    </div>
+
+    <div class="grid">
+      <!-- 1) Call Center Sim -->
+      <div class="card">
+        <div class="thumb">
+          <div class="badge">Scenario Simulation</div>
+        </div>
+        <div class="content">
+          <h4>Call Center De-escalation (Frustration Meter)</h4>
+          <p>Branching dialogue with feedback to build trust and reduce escalation.</p>
+          <div class="meta">
+            <span class="pill">Storyline variables</span>
+            <span class="pill">States</span>
+            <span class="pill">Multiple endings</span>
+          </div>
+        </div>
+        <div class="buttons">
+          <a class="btn btnPrimary" href="call-center-sim/story.html">▶ Launch Demo</a>
+          <a class="btn" href="call-center-sim/case-study.html">📄 Case Study</a>
+        </div>
+      </div>
+
+      <!-- 2) System Training -->
+      <div class="card">
+        <div class="thumb">
+          <div class="badge">System Training</div>
+        </div>
+        <div class="content">
+          <h4>Software Task Training (Illustrator/Photoshop)</h4>
+          <p>Guided practice for completing a workflow with corrective feedback.</p>
+          <div class="meta">
+            <span class="pill">Guided steps</span>
+            <span class="pill">Practice + feedback</span>
+            <span class="pill">Job-ready workflow</span>
+          </div>
+        </div>
+        <div class="buttons">
+          <a class="btn btnPrimary" href="system-training/story.html">▶ Launch Demo</a>
+          <a class="btn" href="system-training/case-study.html">📄 Case Study</a>
+        </div>
+      </div>
+
+      <!-- 3) Compliance Training -->
+      <div class="card">
+        <div class="thumb">
+          <div class="badge">Compliance</div>
+        </div>
+        <div class="content">
+          <h4>Compliance Training (Rebranded Project)</h4>
+          <p>Decision-based scenarios that shift compliance from “checkbox” to applied judgment.</p>
+          <div class="meta">
+            <span class="pill">Scenario dilemmas</span>
+            <span class="pill">Contextual feedback</span>
+            <span class="pill">Policy intent</span>
+          </div>
+        </div>
+        <div class="buttons">
+          <a class="btn btnPrimary" href="compliance-training/story.html">▶ Launch Demo</a>
+          <a class="btn" href="compliance-training/case-study.html">📄 Case Study</a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div>© <span id="year"></span> Jon Oliverson</div>
+      <div>
+        Built with GitHub Pages · Accent <span style="color:var(--accent); font-weight:900;">#299acc</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
