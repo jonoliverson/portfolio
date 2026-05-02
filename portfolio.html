@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio | Jonathan Oliverson</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="index.html">Jonathan Oliverson</a>
+        <nav class="nav">
+          <a href="index.html">Home</a>
+          <a href="about.html">About</a>
+          <a class="active" href="portfolio.html" aria-current="page"
+            >Portfolio</a
+          >
+          <a href="resume.html">Resume</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="section page-hero reveal">
+          <p class="eyebrow">Portfolio</p>
+          <h1>Selected training samples.</h1>
+          <p class="portfolio-intro">
+            Each sample is tied to a practical workplace problem and can be
+            opened directly on the page for review.
+          </p>
+        </section>
+
+        <section class="section">
+          <div class="project-grid">
+            <article class="project-card reveal">
+              <button
+                class="project-open"
+                type="button"
+                data-course-src="cs-call-sim/story.html"
+                data-course-title="Customer Service Call Simulation"
+              >
+                <div class="project-frame">
+                  <div class="frame-chrome">
+                    <span></span><span></span><span></span>
+                  </div>
+                  <div class="project-frame-preview">
+                    <img
+                      class="project-thumbnail"
+                      src="Assets/thumb_project_01.png"
+                      alt="Customer Service Call Simulation project thumbnail"
+                      loading="lazy"
+                    />
+                    <span class="project-launch-hint">Click to open lightbox</span>
+                  </div>
+                </div>
+                <div class="project-copy">
+                  <p class="card-number">Project 01</p>
+                  <h3>Customer Service Call Simulation</h3>
+                  <p>
+                    Scenario-based customer support training focused on tone,
+                    empathy, and response quality during a live interaction.
+                  </p>
+                  <ul class="project-meta">
+                    <li>Tool: Storyline 360</li>
+                    <li>Format: HTML export</li>
+                    <li>Focus: empathy and communication</li>
+                  </ul>
+                </div>
+              </button>
+              <div class="project-footer">
+                <a
+                  class="button button-secondary project-case-link"
+                  href="case-studies.html#project-01"
+                  >View case study</a
+                >
+              </div>
+            </article>
+
+            <article class="project-card reveal">
+              <button
+                class="project-open"
+                type="button"
+                data-course-src="submitting-effective-helpdesk-ticket/Submitting an Effective IT Help Desk Ticket/Submitting an Effective IT Help Desk Tickets/story.html"
+                data-course-title="Submitting Effective IT Help Desk Tickets"
+              >
+                <div class="project-frame">
+                  <div class="frame-chrome">
+                    <span></span><span></span><span></span>
+                  </div>
+                  <div class="project-frame-preview">
+                    <img
+                      class="project-thumbnail"
+                      src="Assets/thumb_project_02.png"
+                      alt="Submitting Effective IT Help Desk Tickets project thumbnail"
+                      loading="lazy"
+                    />
+                    <span class="project-launch-hint">Click to open lightbox</span>
+                  </div>
+                </div>
+                <div class="project-copy">
+                  <p class="card-number">Project 02</p>
+                  <h3>Submitting Effective IT Help Desk Tickets</h3>
+                  <p>
+                    A software workflow simulation that teaches learners how to
+                    submit clearer, more useful IT support tickets.
+                  </p>
+                  <ul class="project-meta">
+                    <li>Tool: Storyline 360</li>
+                    <li>Format: HTML export</li>
+                    <li>Focus: IT request quality</li>
+                  </ul>
+                </div>
+              </button>
+              <div class="project-footer">
+                <a
+                  class="button button-secondary project-case-link"
+                  href="case-studies.html#project-02"
+                  >View case study</a
+                >
+              </div>
+            </article>
+
+            <article class="project-card reveal">
+              <button
+                class="project-open"
+                type="button"
+                data-course-src="customer-service-call-sim/story.html"
+                data-course-title="Document an Interaction Clearly"
+              >
+                <div class="project-frame">
+                  <div class="frame-chrome">
+                    <span></span><span></span><span></span>
+                  </div>
+                  <div class="project-frame-preview">
+                    <img
+                      class="project-thumbnail"
+                      src="Assets/thumb_project_03.png"
+                      alt="Document an Interaction Clearly project thumbnail"
+                      loading="lazy"
+                    />
+                    <span class="project-launch-hint">Click to open lightbox</span>
+                  </div>
+                </div>
+                <div class="project-copy">
+                  <p class="card-number">Project 03</p>
+                  <h3>Document an Interaction Clearly</h3>
+                  <p>
+                    A documentation-focused simulation that teaches learners
+                    how to record clear, structured interaction notes.
+                  </p>
+                  <ul class="project-meta">
+                    <li>Tool: Storyline 360</li>
+                    <li>Format: HTML export</li>
+                    <li>Focus: documentation quality</li>
+                  </ul>
+                </div>
+              </button>
+              <div class="project-footer">
+                <a
+                  class="button button-secondary project-case-link"
+                  href="case-studies.html#project-03"
+                  >View case study</a
+                >
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="course-lightbox" id="course-lightbox" aria-hidden="true">
+      <div class="course-lightbox-backdrop" data-lightbox-close></div>
+      <div class="course-lightbox-dialog" role="dialog" aria-modal="true" aria-labelledby="course-lightbox-title">
+        <div class="course-lightbox-header">
+          <h2 id="course-lightbox-title">Course Preview</h2>
+          <button class="lightbox-close" type="button" data-lightbox-close aria-label="Close lightbox">
+            Close
+          </button>
+        </div>
+        <div class="course-lightbox-body">
+          <iframe
+            id="course-lightbox-frame"
+            class="course-lightbox-frame"
+            src=""
+            title="Course preview"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inbox Defender: Spot the Signs of Phishing</title>
+  <style>
+    :root {
+      --bg: #edf3f9;
+      --bg-deep: #e3ebf4;
+      --panel: rgba(255, 255, 255, 0.96);
+      --panel-strong: #ffffff;
+      --panel-soft: #f7fafd;
+      --line: #d6dfeb;
+      --line-strong: #b2c2d8;
+      --text: #162232;
+      --text-soft: #5a6a7f;
+      --brand: #0c5cc0;
+      --brand-strong: #084897;
+      --brand-soft: #eaf3ff;
+      --accent: #0d8c72;
+      --accent-soft: #e7f8f3;
+      --warning: #b25b00;
+      --warning-soft: #fff3e6;
+      --danger: #b42318;
+      --danger-soft: #fff0ee;
+      --safe: #136f63;
+      --shadow-lg: 0 26px 70px rgba(18, 38, 63, 0.14);
+      --shadow-md: 0 14px 34px rgba(18, 38, 63, 0.09);
+      --shadow-sm: 0 8px 18px rgba(18, 38, 63, 0.06);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --focus: 0 0 0 4px rgba(12, 92, 192, 0.18);
+      --font-body: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      --font-display: "Aptos Display", "Trebuchet MS", "Segoe UI", sans-serif;
+      --max-width: 1280px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-body);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(12, 92, 192, 0.1), transparent 28%),
+        radial-gradient(circle at top right, rgba(13, 140, 114, 0.09), transparent 22%),
+        linear-gradient(180deg, #f9fbfe 0%, var(--bg) 54%, var(--bg-deep) 100%);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease,
+        color 0.18s ease,
+        border-color 0.18s ease;
+    }
+
+    button:hover:enabled {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.62;
+    }
+
+    button:focus-visible,
+    [role="button"]:focus-visible,
+    [role="radio"]:focus-visible,
+    .mail-row:focus-visible,
+    .inspect-target:focus-visible,
+    .scenario-progress button:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .app-shell {
+      width: min(calc(100% - 28px), var(--max-width));
+      margin: 14px auto;
+      min-height: calc(100vh - 28px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .topbar,
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(214, 223, 235, 0.95);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 16px 22px;
+      border-radius: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      background: linear-gradient(135deg, var(--brand-strong) 0%, var(--brand) 55%, #3786e7 100%);
+      box-shadow: 0 12px 28px rgba(12, 92, 192, 0.24);
+      flex: 0 0 auto;
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-copy h1,
+    .brand-copy p {
+      margin: 0;
+    }
+
+    .brand-copy h1 {
+      font-family: var(--font-display);
+      font-size: 1.08rem;
+      letter-spacing: 0.01em;
+    }
+
+    .brand-copy p {
+      color: var(--text-soft);
+      font-size: 0.92rem;
+      margin-top: 2px;
+    }
+
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      flex: 0 0 auto;
+      filter: drop-shadow(0 10px 20px rgba(12, 92, 192, 0.15));
+    }
+
+    .scoreboard {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .status-pill,
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text-soft);
+      font-size: 0.92rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .status-pill strong,
+    .meta-chip strong {
+      color: var(--text);
+    }
+
+    .panel {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .screen {
+      display: grid;
+      min-height: min(760px, calc(100vh - 130px));
+    }
+
+    .welcome-screen {
+      grid-template-columns: minmax(0, 1.16fr) minmax(360px, 0.84fr);
+    }
+
+    .hero-copy,
+    .hero-card {
+      padding: clamp(30px, 4vw, 54px);
+    }
+
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 22px;
+      background:
+        linear-gradient(155deg, rgba(255, 255, 255, 0.98), rgba(246, 250, 255, 0.94)),
+        linear-gradient(135deg, rgba(12, 92, 192, 0.06), transparent);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--brand-soft);
+      color: var(--brand-strong);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .hero-copy h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 4.5vw, 4.45rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      max-width: 10ch;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      max-width: 64ch;
+      color: var(--text-soft);
+      font-size: 1.05rem;
+      line-height: 1.72;
+    }
+
+    .hero-actions,
+    .footer-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 700px;
+    }
+
+    .metric-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .metric-card strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      margin-bottom: 4px;
+    }
+
+    .metric-card span {
+      color: var(--text-soft);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-ghost {
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand-strong) 0%, var(--brand) 52%, #3786e7 100%);
+      box-shadow: 0 14px 28px rgba(12, 92, 192, 0.22);
+    }
+
+    .btn-primary:hover:enabled,
+    .btn-primary:focus-visible {
+      box-shadow: 0 18px 32px rgba(12, 92, 192, 0.26);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: #fff;
+      border: 1px solid var(--line-strong);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary:hover:enabled,
+    .btn-secondary:focus-visible {
+      border-color: var(--brand);
+      background: #fbfdff;
+    }
+
+    .btn-ghost {
+      padding-inline: 10px;
+      background: transparent;
+      color: var(--brand-strong);
+      border: 1px solid transparent;
+    }
+
+    .hero-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 16px;
+      background:
+        linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+      border-left: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -120px -150px auto;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(12, 92, 192, 0.08) 0%, transparent 68%);
+      pointer-events: none;
+    }
+
+    .mini-stack {
+      display: grid;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-illustration {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto 6px;
+      border-radius: 18px;
+      border: 1px solid rgba(214, 223, 235, 0.9);
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: var(--shadow-md);
+    }
+
+    .mini-card {
+      display: grid;
+      gap: 8px;
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .mini-card strong,
+    .mini-card p {
+      margin: 0;
+    }
+
+    .mini-card p {
+      color: var(--text-soft);
+      line-height: 1.62;
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      min-height: min(760px, calc(100vh - 130px));
+    }
+
+    .sidebar {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background:
+        linear-gradient(180deg, #f9fbff 0%, #f1f6fb 100%);
+      border-right: 1px solid var(--line);
+    }
+
+    .sidebar h2,
+    .content-area h2,
+    .content-area h3,
+    .feedback-panel h3,
+    .summary-card h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar h2 {
+      font-size: 1.36rem;
+    }
+
+    .sidebar-section {
+      display: grid;
+      gap: 10px;
+    }
+
+    .subtle,
+    .mail-preview,
+    .mail-meta,
+    .content-header p,
+    .coaching-card p,
+    .decision-panel p,
+    .feedback-panel p,
+    .summary-card p,
+    .summary-card li {
+      color: var(--text-soft);
+    }
+
+    .scenario-progress {
+      display: grid;
+      gap: 10px;
+    }
+
+    .scenario-progress button {
+      width: 100%;
+      text-align: left;
+      padding: 13px 15px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text);
+      font-weight: 700;
+      line-height: 1.45;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .scenario-progress button:hover:enabled {
+      border-color: rgba(12, 92, 192, 0.35);
+      background: #fff;
+    }
+
+    .scenario-progress button.current {
+      border-color: rgba(12, 92, 192, 0.5);
+      background: var(--brand-soft);
+      color: var(--brand-strong);
+    }
+
+    .scenario-progress button.completed::after {
+      content: "Completed";
+      display: block;
+      margin-top: 4px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--safe);
+    }
+
+    .tip-box,
+    .summary-card,
+    .feedback-panel,
+    .decision-panel,
+    .email-panel,
+    .inbox-hint,
+    .coach-banner {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tip-box,
+    .inbox-hint {
+      padding: 18px;
+    }
+
+    .tip-box p,
+    .inbox-hint p {
+      margin: 0;
+      line-height: 1.62;
+    }
+
+    .content-area {
+      padding: 24px 26px 26px;
+      display: grid;
+      gap: 18px;
+      align-content: start;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 251, 255, 0.94));
+    }
+
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .content-header h2 {
+      font-size: clamp(1.8rem, 2.6vw, 2.45rem);
+    }
+
+    .content-header p {
+      margin: 8px 0 0;
+      max-width: 70ch;
+      line-height: 1.68;
+    }
+
+    .progress-banner {
+      display: grid;
+      gap: 10px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .progress-copy {
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: #e5edf7;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--brand) 100%);
+      transition: width 0.3s ease;
+    }
+
+    .inbox-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .mail-row {
+      width: 100%;
+      text-align: left;
+      display: grid;
+      grid-template-columns: 132px minmax(0, 1fr);
+      gap: 10px;
+      padding: 18px 20px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .mail-row:hover,
+    .mail-row:focus-visible {
+      border-color: rgba(12, 92, 192, 0.42);
+      background: #fbfdff;
+      box-shadow: 0 14px 28px rgba(18, 38, 63, 0.08);
+    }
+
+    .mail-art {
+      width: 100%;
+      min-height: 96px;
+      align-self: stretch;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fbfdff 0%, #f1f6fb 100%);
+    }
+
+    .mail-content {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .mail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .mail-sender {
+      font-size: 0.98rem;
+      font-weight: 800;
+    }
+
+    .mail-subject {
+      font-size: 1.08rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .mail-preview {
+      line-height: 1.62;
+      font-size: 0.97rem;
+    }
+
+    .mail-flags,
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--panel-soft);
+      color: var(--text-soft);
+      border: 1px solid var(--line);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .email-panel {
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .email-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 16px 18px;
+      background: var(--panel-soft);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .email-header {
+      display: grid;
+      gap: 10px;
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(250, 252, 255, 0.9), #fff 100%);
+    }
+
+    .email-header h3 {
+      margin: 0;
+      font-size: clamp(1.45rem, 2.2vw, 1.95rem);
+      letter-spacing: -0.02em;
+    }
+
+    .email-meta {
+      display: grid;
+      gap: 6px;
+      line-height: 1.6;
+      color: var(--text-soft);
+    }
+
+    .email-body {
+      display: grid;
+      gap: 18px;
+      padding: 22px 24px 24px;
+      line-height: 1.8;
+      font-size: 0.99rem;
+    }
+
+    .email-body p {
+      margin: 0;
+    }
+
+    .inspect-target {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 11px;
+      margin: 3px 5px 3px 0;
+      border-radius: 999px;
+      border: 1px dashed #7489a3;
+      background: #f9fbff;
+      color: var(--text);
+      font-weight: 700;
+      vertical-align: middle;
+      box-shadow: 0 2px 0 rgba(18, 38, 63, 0.03);
+    }
+
+    .inspect-target:hover:enabled,
+    .inspect-target:focus-visible {
+      border-color: var(--brand);
+      background: var(--brand-soft);
+    }
+
+    .inspect-target::before {
+      content: "Inspect";
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brand-strong);
+    }
+
+    .inspect-target.inspected {
+      border-style: solid;
+      border-color: rgba(12, 92, 192, 0.44);
+      background: var(--brand-soft);
+    }
+
+    .inspect-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .investigation-panel,
+    .coaching-card {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .coach-banner {
+      display: grid;
+      gap: 8px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    }
+
+    .coach-banner strong {
+      font-size: 1rem;
+    }
+
+    .coach-banner p {
+      margin: 0;
+      line-height: 1.62;
+    }
+
+    .coaching-callout {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      line-height: 1.6;
+    }
+
+    .coaching-callout strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .inspected-list {
+      display: grid;
+      gap: 10px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .inspected-item {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      line-height: 1.58;
+    }
+
+    .inspected-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .label-pill {
+      display: inline-flex;
+      width: fit-content;
+      margin-bottom: 8px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .label-pill.suspicious {
+      color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .label-pill.benign {
+      color: var(--safe);
+      background: var(--accent-soft);
+    }
+
+    .decision-panel,
+    .feedback-panel,
+    .summary-card {
+      display: grid;
+      gap: 18px;
+      padding: 22px;
+    }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .decision-card {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr);
+      gap: 8px;
+      min-height: 152px;
+      padding: 18px;
+      text-align: left;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .decision-card:hover:enabled,
+    .decision-card:focus-visible {
+      border-color: rgba(12, 92, 192, 0.45);
+      background: #fbfdff;
+    }
+
+    .decision-card.selected {
+      border-color: rgba(12, 92, 192, 0.55);
+      background: var(--brand-soft);
+    }
+
+    .decision-card strong {
+      font-size: 1rem;
+    }
+
+    .decision-card span {
+      color: var(--text-soft);
+      line-height: 1.58;
+    }
+
+    .decision-icon {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      align-self: start;
+      margin-top: 2px;
+    }
+
+    .decision-copy {
+      display: grid;
+      gap: 8px;
+    }
+
+    .feedback-grid,
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .feedback-card,
+    .score-card,
+    .tip-card {
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+    }
+
+    .feedback-badge,
+    .performance-badge {
+      width: auto;
+      max-width: 220px;
+      height: auto;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .summary-hero {
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .feedback-card h4,
+    .score-card h4,
+    .tip-card h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .feedback-list,
+    .summary-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.58;
+    }
+
+    .summary-score {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .score-total {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 4vw, 3.8rem);
+      line-height: 1;
+      color: var(--brand-strong);
+      letter-spacing: -0.03em;
+    }
+
+    .performance-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-weight: 800;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .score-note {
+      color: var(--text-soft);
+      line-height: 1.64;
+      margin: 0;
+      max-width: 58ch;
+    }
+
+    .tone-safe {
+      color: var(--safe);
+    }
+
+    .tone-danger {
+      color: var(--danger);
+    }
+
+    .tone-caution {
+      color: var(--warning);
+    }
+
+    .kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.8em;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid var(--line-strong);
+      background: #fff;
+      color: var(--text);
+      font-size: 0.84rem;
+      box-shadow: inset 0 -1px 0 rgba(18, 38, 63, 0.08);
+    }
+
+    .tip-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .tip-icon {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 1100px) {
+      .welcome-screen,
+      .app-layout,
+      .inspect-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-card,
+      .sidebar {
+        border-left: 0;
+        border-right: 0;
+      }
+
+      .sidebar {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .screen {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app-shell {
+        width: min(calc(100% - 16px), var(--max-width));
+        margin: 8px auto;
+      }
+
+      .topbar,
+      .content-area,
+      .sidebar,
+      .hero-copy,
+      .hero-card {
+        padding: 18px;
+      }
+
+      .hero-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .mail-row,
+      .decision-card {
+        grid-template-columns: 1fr;
+      }
+
+      .mail-art {
+        min-height: 120px;
+      }
+
+      .mail-row,
+      .email-header,
+      .email-body,
+      .decision-panel,
+      .feedback-panel,
+      .summary-card {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar" aria-label="Training status bar">
+      <div class="brand">
+        <img class="brand-logo" src="./assets/inbox-defender-logo-256x256.svg" alt="Inbox Defender logo">
+        <div class="brand-copy">
+          <h1>Inbox Defender</h1>
+          <p>Interactive phishing awareness simulation</p>
+        </div>
+      </div>
+
+      <div class="scoreboard" aria-label="Progress, score, and best score">
+        <div class="status-pill"><strong id="top-progress">Welcome</strong></div>
+        <div class="status-pill">Score <strong id="top-score">0</strong></div>
+        <div class="status-pill">Best <strong id="top-best-score">0</strong></div>
+      </div>
+    </header>
+
+    <main id="app" class="panel" tabindex="-1" aria-describedby="live-region"></main>
+  </div>
+
+  <div id="live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    /*
+      Inbox Defender: Spot the Signs of Phishing
+      Portfolio-ready single-file training module with:
+      - embedded styles and scripts
+      - editable scenario data
+      - central state and render functions
+      - keyboard-friendly interactions
+      - localStorage persistence for best score
+    */
+
+    // ---------------------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------------------
+    const APP_TITLE = "Inbox Defender: Spot the Signs of Phishing";
+    const STORAGE_KEY = "inbox-defender-best-score";
+    const MIN_INSPECTIONS_REQUIRED = 2;
+    const SCORING = {
+      suspiciousClue: 10,
+      correctAction: 5,
+      dangerousActionPenalty: -5
+    };
+
+    const ACTIONS = [
+      { id: "report", label: "Report phishing", description: "Escalate it through the security or phishing-reporting channel." },
+      { id: "delete", label: "Delete", description: "Remove it without engaging if no business follow-up is needed." },
+      { id: "reply", label: "Reply for clarification", description: "Respond directly to ask the sender to verify the request." },
+      { id: "click", label: "Click the link", description: "Open the link or button in the email to continue." },
+      { id: "safe", label: "Mark safe", description: "Treat it as normal business communication and move on." }
+    ];
+
+    // ---------------------------------------------------------------------
+    // Scenario data
+    // ---------------------------------------------------------------------
+    const SCENARIOS = [
+      {
+        id: "it-reset",
+        art: "assets/scenario-password-reset-320x180.svg",
+        category: "Potential account compromise",
+        senderName: "IT Service Desk",
+        senderEmail: "support@company-it-helpdesk.net",
+        subject: "Action Required: Password Reset to Avoid Mailbox Suspension",
+        preview: "Your password expires today. Complete the secure reset within 30 minutes to keep email access.",
+        dateLabel: "Today, 9:14 AM",
+        type: "phishing",
+        safestAction: "report",
+        dangerousActions: ["click", "reply", "safe"],
+        coachingSummary: "This message uses several classic phishing tactics at once: a lookalike sender domain, a login-related request, manufactured urgency, and a link that does not belong to the company.",
+        bodyIntro: "Start by examining the sender details, the reset request, and the pressure built into the wording. Attackers often combine urgency with account-security themes because employees are used to acting quickly on IT requests.",
+        bodyBlocks: [
+          { type: "paragraph", content: "Team member," },
+          {
+            type: "paragraph",
+            content: "Our messaging environment has detected an authentication mismatch on your mailbox. As part of the remediation process, all impacted users must complete a password reset to keep access to Outlook, Teams, and VPN services."
+          },
+          {
+            type: "paragraph",
+            content: "Please complete the secure verification step below within 30 minutes. Accounts that remain unverified may be placed into a temporary restricted state while the security review is finalized."
+          },
+          { type: "targets", ids: ["reset-link", "sender-domain", "urgency-window", "generic-greeting"] },
+          {
+            type: "paragraph",
+            content: "If you did not initiate this activity, complete the reset anyway so the platform can confirm the account belongs to you and restore normal service."
+          },
+          { type: "paragraph", content: "Thank you,\nEnterprise Messaging Security Team" }
+        ],
+        targets: [
+          {
+            id: "reset-link",
+            label: "Reset your password now",
+            type: "suspicious",
+            location: "Link",
+            detail: "The visible call to action looks routine, but the destination is `http://companymail-verification-login.com/reset`, not a company domain and not HTTPS.",
+            coaching: "Treat login, password, MFA, and payroll links as high-risk. If the destination does not clearly belong to your organization, stop and verify through a trusted internal channel."
+          },
+          {
+            id: "sender-domain",
+            label: "Sender address",
+            type: "suspicious",
+            location: "From field",
+            detail: "The sender is `support@company-it-helpdesk.net`, which imitates an internal service desk but does not use the company email domain.",
+            coaching: "Display names are easy to fake. The full sender address often reveals the strongest clue in phishing emails."
+          },
+          {
+            id: "urgency-window",
+            label: "30-minute deadline",
+            type: "suspicious",
+            location: "Body text",
+            detail: "The message pushes a 30-minute deadline and implies you could lose access if you pause to verify.",
+            coaching: "Urgency is a social engineering tool. Real internal teams usually allow a reasonable process for verification instead of demanding instant action."
+          },
+          {
+            id: "generic-greeting",
+            label: "Team member",
+            type: "suspicious",
+            location: "Greeting",
+            detail: "The greeting is generic and impersonal rather than using your name, department, or a standard internal template.",
+            coaching: "A generic greeting is not enough by itself, but combined with a fake domain and risky link it reinforces the phishing pattern."
+          }
+        ]
+      },
+      {
+        id: "hr-policy",
+        art: "assets/scenario-hr-policy-320x180.svg",
+        category: "Routine internal communication",
+        senderName: "Maya Chen, HR Business Partner",
+        senderEmail: "maya.chen@northbridgecorp.com",
+        subject: "Updated Remote Work and Equipment Policy",
+        preview: "Please review the updated policy before Friday. The policy page includes a summary of changes and manager FAQs.",
+        dateLabel: "Today, 11:02 AM",
+        type: "legitimate",
+        safestAction: "safe",
+        dangerousActions: [],
+        coachingSummary: "This email reflects a normal internal communication pattern: a named sender on the company domain, a reasonable deadline, expected HR subject matter, and a link to the intranet.",
+        bodyIntro: "Not every unfamiliar message is malicious. Strong email judgment includes recognizing legitimate internal communication instead of treating every message as suspicious by default.",
+        bodyBlocks: [
+          { type: "paragraph", content: "Hello team," },
+          {
+            type: "paragraph",
+            content: "We have published the updated Remote Work and Equipment Policy following the Q2 legal, facilities, and finance review. Please read the revised guidance before Friday so managers can answer questions during next week's department meetings."
+          },
+          { type: "targets", ids: ["hr-link", "known-sender", "measured-tone", "contact-offer"] },
+          {
+            type: "paragraph",
+            content: "The intranet page includes a short summary of the changes, manager FAQs, and updated reimbursement steps for approved home office equipment."
+          },
+          {
+            type: "paragraph",
+            content: "If anything is unclear, reply to me directly or join the open office hours session on Thursday from 2:00 to 2:30 PM.\n\nThank you,\nMaya"
+          }
+        ],
+        targets: [
+          {
+            id: "hr-link",
+            label: "Remote Work Policy page",
+            type: "benign",
+            location: "Link",
+            detail: "The link goes to `https://intranet.northbridgecorp.com/policies/remote-work`, which matches the organization and the subject matter.",
+            coaching: "A company intranet link tied to a plausible HR topic is a reassuring sign. It still helps to inspect the domain before clicking, but nothing here stands out as deceptive."
+          },
+          {
+            id: "known-sender",
+            label: "Sender address",
+            type: "benign",
+            location: "From field",
+            detail: "The sender is a named HR business partner on the correct company domain.",
+            coaching: "Named internal senders aligned to a normal business function are a positive signal, especially when the message content matches their role."
+          },
+          {
+            id: "measured-tone",
+            label: "Normal deadline and wording",
+            type: "benign",
+            location: "Body text",
+            detail: "The email gives a business reason, a deadline later in the week, and does not threaten penalties for pausing to review.",
+            coaching: "Legitimate workplace emails usually provide context and a reasonable timeline rather than urgency designed to bypass judgment."
+          },
+          {
+            id: "contact-offer",
+            label: "Reply or office hours option",
+            type: "benign",
+            location: "Footer",
+            detail: "The sender offers direct follow-up and office hours, both of which are typical of normal internal communications.",
+            coaching: "Offering familiar verification paths is a good sign. Phishing emails often push one risky action instead of normal business follow-up."
+          }
+        ]
+      },
+      {
+        id: "vendor-invoice",
+        art: "assets/scenario-vendor-invoice-320x180.svg",
+        category: "Financial request",
+        senderName: "Everlane Office Supply Billing",
+        senderEmail: "billing@everlaneofficesupply.co",
+        subject: "Invoice 10483 Due Today - Updated Banking Instructions",
+        preview: "Please review the attached invoice and confirm payment routing details for this month's office supply order.",
+        dateLabel: "Today, 2:47 PM",
+        type: "gray",
+        safestAction: "report",
+        dangerousActions: ["click", "reply"],
+        coachingSummary: "Vendor fraud often looks polished. Here the biggest risks are the slightly altered domain, the surprise request to change payment details, and the lack of concrete purchase context.",
+        bodyIntro: "This is the kind of message that catches busy teams off guard. It sounds operational and believable, but subtle financial red flags matter more than polished formatting.",
+        bodyBlocks: [
+          { type: "paragraph", content: "Good afternoon," },
+          {
+            type: "paragraph",
+            content: "Attached is invoice 10483 for your March office supply order. Our finance team recently transitioned to a new payment processor, so please use the revised banking instructions listed in the invoice portal before remitting today's payment."
+          },
+          { type: "targets", ids: ["vendor-domain", "invoice-link", "payment-change", "vague-context", "signature-line"] },
+          {
+            type: "paragraph",
+            content: "To avoid a service interruption on open shipments, please complete payment today and email remittance confirmation once submitted."
+          },
+          { type: "paragraph", content: "Regards,\nAccounts Receivable\nEverlane Office Supply" }
+        ],
+        targets: [
+          {
+            id: "vendor-domain",
+            label: "Sender address",
+            type: "suspicious",
+            location: "From field",
+            detail: "The domain uses `.co` instead of the vendor's usual `.com`, a small difference that is easy to miss when scanning quickly.",
+            coaching: "Lookalike vendor domains are common in invoice fraud. Slowing down long enough to read the full domain can prevent a costly mistake."
+          },
+          {
+            id: "invoice-link",
+            label: "Invoice portal",
+            type: "benign",
+            location: "Link",
+            detail: "The portal appears branded and uses HTTPS, but this alone does not make the request trustworthy.",
+            coaching: "This is a useful reminder that one normal-looking detail should not outweigh stronger warning signs elsewhere in the message."
+          },
+          {
+            id: "payment-change",
+            label: "Updated banking instructions",
+            type: "suspicious",
+            location: "Body text",
+            detail: "The email asks you to use revised banking instructions. Unexpected requests to change payment details are a major fraud indicator.",
+            coaching: "Any request to change banking details should be verified through a trusted vendor contact or existing procurement channel before payment is sent."
+          },
+          {
+            id: "vague-context",
+            label: "March office supply order",
+            type: "suspicious",
+            location: "Order reference",
+            detail: "The message mentions a general order but includes no purchase order number, department requester, previous thread, or delivery reference.",
+            coaching: "Fraudsters often rely on broad operational language that sounds plausible without tying the request to a specific transaction your team can confirm."
+          },
+          {
+            id: "signature-line",
+            label: "Accounts Receivable signature",
+            type: "benign",
+            location: "Signature",
+            detail: "A plain billing signature is common in vendor emails and is not suspicious on its own.",
+            coaching: "Some details are neutral. Good email judgment means weighing stronger signals more heavily than routine formatting."
+          }
+        ]
+      }
+    ];
+
+    // ---------------------------------------------------------------------
+    // Central state
+    // ---------------------------------------------------------------------
+    const state = {
+      screen: "welcome",
+      currentScenarioIndex: 0,
+      score: 0,
+      bestScore: 0,
+      results: {},
+      lastAnnouncement: "",
+      preferredFocus: null
+    };
+
+    // ---------------------------------------------------------------------
+    // State helpers
+    // ---------------------------------------------------------------------
+    function getScenario(index = state.currentScenarioIndex) {
+      return SCENARIOS[index];
+    }
+
+    function getAssetPath(relativePath) {
+      return `./${relativePath}`;
+    }
+
+    function getActionIcon(actionId) {
+      const actionIcons = {
+        report: "assets/report-phishing-icon-64x64.svg",
+        delete: "assets/delete-icon-64x64.svg",
+        reply: "assets/reply-icon-64x64.svg",
+        click: "assets/click-link-icon-64x64.svg",
+        safe: "assets/mark-safe-icon-64x64.svg"
+      };
+      return getAssetPath(actionIcons[actionId]);
+    }
+
+    function getPerformanceBadge(score) {
+      const band = calculatePerformanceBand(score);
+      const badgeByBand = {
+        "Needs Practice": "assets/needs-practice-badge-220x72.svg",
+        "Developing": "assets/developing-badge-220x72.svg",
+        "Sharp Eye": "assets/sharp-eye-badge-220x72.svg",
+        "Inbox Defender": "assets/inbox-defender-badge-220x72.svg"
+      };
+
+      return {
+        band,
+        path: getAssetPath(badgeByBand[band])
+      };
+    }
+
+    function getActionQualityBadge(result, scenario) {
+      if (result.selectedAction === scenario.safestAction) {
+        return getAssetPath("assets/best-choice-badge-160x48.svg");
+      }
+
+      if (scenario.dangerousActions.includes(result.selectedAction)) {
+        return getAssetPath("assets/high-risk-badge-160x48.svg");
+      }
+
+      return getAssetPath("assets/reasonable-caution-badge-160x48.svg");
+    }
+
+    function createEmptyResult() {
+      return {
+        inspected: [],
+        suspiciousFound: [],
+        benignInspected: [],
+        selectedAction: null,
+        clueScore: 0,
+        actionScore: 0,
+        feedbackViewed: false,
+        lastInspectedId: null
+      };
+    }
+
+    function getScenarioResult(scenarioId) {
+      if (!state.results[scenarioId]) {
+        state.results[scenarioId] = createEmptyResult();
+      }
+      return state.results[scenarioId];
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function announce(message) {
+      state.lastAnnouncement = message;
+      const liveRegion = document.getElementById("live-region");
+      liveRegion.textContent = "";
+      window.requestAnimationFrame(() => {
+        liveRegion.textContent = message;
+      });
+    }
+
+    function getCompletedCount() {
+      return SCENARIOS.filter((scenario) => getScenarioResult(scenario.id).feedbackViewed).length;
+    }
+
+    function getProgressPercent() {
+      return Math.round((getCompletedCount() / SCENARIOS.length) * 100);
+    }
+
+    function isScenarioComplete(index) {
+      return getScenarioResult(SCENARIOS[index].id).feedbackViewed;
+    }
+
+    function calculatePerformanceBand(score) {
+      if (score >= 95) return "Inbox Defender";
+      if (score >= 75) return "Sharp Eye";
+      if (score >= 45) return "Developing";
+      return "Needs Practice";
+    }
+
+    function getBestScore() {
+      try {
+        const stored = window.localStorage.getItem(STORAGE_KEY);
+        return stored ? Number(stored) || 0 : 0;
+      } catch (error) {
+        return 0;
+      }
+    }
+
+    function persistBestScore() {
+      if (state.score <= state.bestScore) return;
+      state.bestScore = state.score;
+
+      try {
+        window.localStorage.setItem(STORAGE_KEY, String(state.bestScore));
+      } catch (error) {
+        // Storage can fail in some privacy modes; the app should still work.
+      }
+    }
+
+    function setTopBar() {
+      const progressNode = document.getElementById("top-progress");
+      const scoreNode = document.getElementById("top-score");
+      const bestNode = document.getElementById("top-best-score");
+
+      const progressText = state.screen === "welcome"
+        ? "Welcome"
+        : state.screen === "summary"
+          ? "Complete"
+          : `Email ${Math.min(state.currentScenarioIndex + 1, SCENARIOS.length)} of ${SCENARIOS.length}`;
+
+      progressNode.textContent = progressText;
+      scoreNode.textContent = String(state.score);
+      bestNode.textContent = String(state.bestScore);
+      document.title = APP_TITLE;
+    }
+
+    // After each render, move focus to the main heading or a more specific
+    // interactive element if the current screen would benefit from it.
+    function focusAfterRender() {
+      const appRoot = document.getElementById("app");
+      const preferredTarget = state.preferredFocus
+        ? appRoot.querySelector(state.preferredFocus)
+        : null;
+      const defaultTarget = appRoot.querySelector("[data-focus-target]");
+
+      state.preferredFocus = null;
+
+      const nextTarget = preferredTarget || defaultTarget || appRoot;
+      window.requestAnimationFrame(() => {
+        if (nextTarget && typeof nextTarget.focus === "function") {
+          nextTarget.focus();
+        }
+      });
+    }
+
+    function buildProgressBanner(label) {
+      return `
+        <section class="progress-banner" aria-label="Training progress">
+          <div class="progress-head">
+            <div>
+              <strong>${escapeHtml(label)}</strong>
+              <div class="progress-copy">${getCompletedCount()} of ${SCENARIOS.length} scenarios completed</div>
+            </div>
+            <div class="chip-row">
+              <span class="badge">Current score: ${state.score}</span>
+              <span class="badge">Best score: ${state.bestScore}</span>
+            </div>
+          </div>
+          <div class="progress-bar" aria-hidden="true">
+            <div class="progress-fill" style="width: ${getProgressPercent()}%"></div>
+          </div>
+        </section>
+      `;
+    }
+
+    function buildSidebar(currentIndex) {
+      const completedCount = getCompletedCount();
+
+      return `
+        <aside class="sidebar" aria-label="Scenario navigation and tips">
+          <div class="sidebar-section">
+            <h2 tabindex="-1" data-focus-target>Training Flow</h2>
+            <p class="subtle">Inspect clues, make a response decision, and review the coaching before moving on.</p>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="meta-chip"><strong>${completedCount}</strong> completed</div>
+            <div class="meta-chip"><strong>${getProgressPercent()}%</strong> overall progress</div>
+          </div>
+
+          <div class="sidebar-section">
+            <h3>Scenarios</h3>
+            <div class="scenario-progress" role="list">
+              ${SCENARIOS.map((scenario, index) => {
+                const classes = [
+                  index === currentIndex ? "current" : "",
+                  isScenarioComplete(index) ? "completed" : ""
+                ].filter(Boolean).join(" ");
+
+                return `
+                  <button
+                    type="button"
+                    class="${classes}"
+                    data-action="jump-scenario"
+                    data-index="${index}"
+                    ${index > completedCount ? "disabled" : ""}
+                    aria-label="Scenario ${index + 1}: ${escapeHtml(scenario.subject)}"
+                  >
+                    ${index + 1}. ${escapeHtml(scenario.subject)}
+                  </button>
+                `;
+              }).join("")}
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <h3>What matters most</h3>
+            <p>Slow down for login requests, payment changes, urgent deadlines, and sender addresses that are almost right but not quite. Strong phishing defense is pattern recognition plus process discipline.</p>
+          </div>
+        </aside>
+      `;
+    }
+
+    // ---------------------------------------------------------------------
+    // Content helpers
+    // ---------------------------------------------------------------------
+    function renderBodyBlock(block, scenario, result) {
+      if (block.type === "paragraph") {
+        return `<p>${escapeHtml(block.content).replace(/\n/g, "<br>")}</p>`;
+      }
+
+      if (block.type === "targets") {
+        return `
+          <p>
+            ${block.ids.map((targetId) => {
+              const target = scenario.targets.find((item) => item.id === targetId);
+              const inspected = result.inspected.includes(targetId);
+              return `
+                <button
+                  type="button"
+                  class="inspect-target ${inspected ? "inspected" : ""}"
+                  data-action="inspect-target"
+                  data-target-id="${escapeHtml(target.id)}"
+                  aria-pressed="${inspected ? "true" : "false"}"
+                  aria-label="Inspect ${escapeHtml(target.label)}"
+                >
+                  ${escapeHtml(target.label)}
+                </button>
+              `;
+            }).join("")}
+          </p>
+        `;
+      }
+
+      return "";
+    }
+
+    function renderInspectedList(scenario, result) {
+      if (result.inspected.length === 0) {
+        return `
+          <li class="inspected-item">
+            <strong>No clues inspected yet</strong>
+            Select at least ${MIN_INSPECTIONS_REQUIRED} elements to unlock your final action. Both suspicious and normal details are worth checking.
+          </li>
+        `;
+      }
+
+      return result.inspected.map((targetId) => {
+        const target = scenario.targets.find((item) => item.id === targetId);
+        const labelClass = target.type === "suspicious" ? "suspicious" : "benign";
+        const labelText = target.type === "suspicious" ? "Possible warning sign" : "Likely normal detail";
+
+        return `
+          <li class="inspected-item">
+            <span class="label-pill ${labelClass}">${labelText}</span>
+            <strong>${escapeHtml(target.label)}</strong>
+            ${escapeHtml(target.detail)}<br><br>
+            <span class="${target.type === "suspicious" ? "tone-danger" : "tone-safe"}">${escapeHtml(target.coaching)}</span>
+          </li>
+        `;
+      }).join("");
+    }
+
+    function buildClueSummary(result, scenario) {
+      const suspiciousTargets = scenario.targets.filter((target) => target.type === "suspicious");
+      const missedTargets = suspiciousTargets.filter((target) => !result.suspiciousFound.includes(target.id));
+      const safeTargets = result.benignInspected.map((id) => scenario.targets.find((item) => item.id === id));
+
+      return {
+        suspiciousTargets,
+        missedTargets,
+        safeTargets
+      };
+    }
+
+    function getActionQuality(result, scenario) {
+      if (result.selectedAction === scenario.safestAction) {
+        return {
+          title: "Best choice",
+          detail: "You chose the safest action for the evidence in this email.",
+          toneClass: "tone-safe"
+        };
+      }
+
+      if (scenario.dangerousActions.includes(result.selectedAction)) {
+        return {
+          title: "High-risk choice",
+          detail: "This response would expose you to unnecessary risk because it engages directly with the suspicious request.",
+          toneClass: "tone-danger"
+        };
+      }
+
+      return {
+        title: "Reasonable caution, but not ideal",
+        detail: "This response avoids the most dangerous path, but there was a stronger action available.",
+        toneClass: "tone-caution"
+      };
+    }
+
+    function getSummaryTipCards() {
+      return [
+        {
+          title: "Verify outside the email",
+          body: "For password resets, invoice changes, and urgent account issues, use a trusted website, directory, chat channel, or known phone number instead of replying to the message.",
+          icon: "assets/verify-outside-email-icon-48x48.svg"
+        },
+        {
+          title: "Trust process over pressure",
+          body: "Attackers want speed. When an email tries to rush you past normal approval, procurement, or support steps, that pressure is part of the attack.",
+          icon: "assets/slow-down-icon-48x48.svg"
+        },
+        {
+          title: "Look for clusters of clues",
+          body: "One detail may be neutral. Several details together such as a lookalike domain, vague context, and a risky request form a much clearer signal.",
+          icon: "assets/verify-sender-icon-48x48.svg"
+        },
+        {
+          title: "Treat money and credentials as special",
+          body: "Any request involving logins, MFA codes, payroll, gift cards, or banking details deserves a slower verification path.",
+          icon: "assets/protect-payments-icon-48x48.svg"
+        }
+      ];
+    }
+
+    // ---------------------------------------------------------------------
+    // Render functions
+    // ---------------------------------------------------------------------
+    function renderWelcomeScreen() {
+      return `
+        <section class="screen welcome-screen" aria-labelledby="welcome-title">
+          <div class="hero-copy">
+            <span class="eyebrow">Interactive workplace training</span>
+            <h2 id="welcome-title" tabindex="-1" data-focus-target>${escapeHtml(APP_TITLE)}</h2>
+            <p>
+              Review realistic workplace emails, inspect suspicious and benign clues, and choose the safest response.
+              The simulation mixes an obvious phishing lure, a legitimate internal message, and a polished gray-area vendor request.
+            </p>
+            <p>
+              You must inspect at least ${MIN_INSPECTIONS_REQUIRED} clues before submitting each analysis. Your score rewards accurate red-flag detection and strong response choices, and your best score is saved on this device.
+            </p>
+
+            <div class="hero-actions">
+              <button type="button" class="btn-primary" data-action="start-training">Start Training</button>
+            </div>
+
+            <div class="hero-metrics" aria-label="Training highlights">
+              <div class="metric-card">
+                <strong>3</strong>
+                <span>Inbox scenarios with realistic workplace context</span>
+              </div>
+              <div class="metric-card">
+                <strong>Click to inspect</strong>
+                <span>Immediate coaching on links, sender details, tone, and context</span>
+              </div>
+              <div class="metric-card">
+                <strong>Best score saved</strong>
+                <span>Current personal best: ${state.bestScore}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-card" aria-label="How the simulation works">
+            <div class="mini-stack">
+              <img class="hero-illustration" src="${getAssetPath("assets/completion-hero-640x360.svg")}" alt="Illustration showing an inbox review and phishing awareness workflow">
+              <article class="mini-card">
+                <strong>1. Open the inbox</strong>
+                <p>Scan sender names, subjects, preview text, and categories before choosing which email to review.</p>
+              </article>
+              <article class="mini-card">
+                <strong>2. Investigate with intent</strong>
+                <p>Inspect at least two clues. Some will confirm risk; others will show what a normal business email looks like.</p>
+              </article>
+              <article class="mini-card">
+                <strong>3. Make the safest call</strong>
+                <p>Choose the action you would take, then compare your reasoning against coaching written for a general workplace audience.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderInboxScreen() {
+      return `
+        <section class="screen app-layout" aria-labelledby="inbox-title">
+          ${buildSidebar(state.currentScenarioIndex)}
+
+          <div class="content-area">
+            <div class="content-header">
+              <div>
+                <h2 id="inbox-title" tabindex="-1" data-focus-target>Training Inbox</h2>
+                <p>Select the next email to investigate. The inbox is designed to feel plausible rather than exaggerated, so look closely instead of assuming every suspicious clue will be obvious.</p>
+              </div>
+              <div class="meta-chip"><strong>Next task:</strong> Open email ${state.currentScenarioIndex + 1}</div>
+            </div>
+
+            ${buildProgressBanner("Your inbox review progress")}
+
+            <div class="inbox-hint">
+              <p><strong>Tip:</strong> In a real mailbox, the preview text and sender line often shape your first impression. Treat those first signals as starting points, not proof.</p>
+            </div>
+
+            <div class="inbox-list" role="list">
+              ${SCENARIOS.map((scenario, index) => `
+                <button
+                  type="button"
+                  class="mail-row"
+                  role="listitem"
+                  data-action="open-email"
+                  data-index="${index}"
+                  data-focus-id="scenario-${index}"
+                  aria-describedby="mail-preview-${scenario.id}"
+                >
+                  <img class="mail-art" src="${getAssetPath(scenario.art)}" alt="" aria-hidden="true">
+                  <div class="mail-content">
+                    <div class="mail-header">
+                      <span class="mail-sender">${escapeHtml(scenario.senderName)} <span class="mail-meta">&lt;${escapeHtml(scenario.senderEmail)}&gt;</span></span>
+                      <span class="badge">${escapeHtml(scenario.dateLabel)}</span>
+                    </div>
+                    <div class="mail-subject">${escapeHtml(scenario.subject)}</div>
+                    <div id="mail-preview-${scenario.id}" class="mail-preview">${escapeHtml(scenario.preview)}</div>
+                    <div class="mail-flags">
+                      <span class="badge">${escapeHtml(scenario.category)}</span>
+                      <span class="badge">${isScenarioComplete(index) ? "Reviewed" : "Ready to review"}</span>
+                    </div>
+                  </div>
+                </button>
+              `).join("")}
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderEmailDetailScreen() {
+      const scenario = getScenario();
+      const result = getScenarioResult(scenario.id);
+      const inspectionsRemaining = Math.max(MIN_INSPECTIONS_REQUIRED - result.inspected.length, 0);
+      const latestTarget = result.lastInspectedId
+        ? scenario.targets.find((target) => target.id === result.lastInspectedId)
+        : null;
+
+      return `
+        <section class="screen app-layout" aria-labelledby="email-title">
+          ${buildSidebar(state.currentScenarioIndex)}
+
+          <div class="content-area">
+            <div class="content-header">
+              <div>
+                <h2 id="email-title" tabindex="-1" data-focus-target>Investigate the Email</h2>
+                <p>${escapeHtml(scenario.bodyIntro)} Use the inspect controls inside the email to examine individual clues before choosing a final response.</p>
+              </div>
+              <div class="footer-actions">
+                <button type="button" class="btn-secondary" data-action="back-to-inbox">Back to inbox</button>
+                <button
+                  type="button"
+                  class="btn-primary"
+                  data-action="go-to-decision"
+                  ${result.inspected.length < MIN_INSPECTIONS_REQUIRED ? "disabled" : ""}
+                >
+                  ${result.inspected.length < MIN_INSPECTIONS_REQUIRED ? `Inspect ${inspectionsRemaining} more` : "Choose an action"}
+                </button>
+              </div>
+            </div>
+
+            ${buildProgressBanner(`Scenario ${state.currentScenarioIndex + 1}: ${scenario.category}`)}
+
+            <div class="inspect-grid">
+              <article class="email-panel" aria-label="Email message">
+                <div class="email-toolbar">
+                  <div class="meta-chip"><strong>From:</strong> ${escapeHtml(scenario.senderName)} &lt;${escapeHtml(scenario.senderEmail)}&gt;</div>
+                  <div class="meta-chip"><strong>Received:</strong> ${escapeHtml(scenario.dateLabel)}</div>
+                </div>
+
+                <div class="email-header">
+                  <h3>${escapeHtml(scenario.subject)}</h3>
+                  <div class="email-meta">
+                    <span><strong>From:</strong> ${escapeHtml(scenario.senderName)} &lt;${escapeHtml(scenario.senderEmail)}&gt;</span>
+                    <span><strong>To:</strong> You</span>
+                    <span><strong>Category:</strong> ${escapeHtml(scenario.category)}</span>
+                  </div>
+                </div>
+
+                <div class="email-body">
+                  ${scenario.bodyBlocks.map((block) => renderBodyBlock(block, scenario, result)).join("")}
+                </div>
+              </article>
+
+              <div class="investigation-panel" aria-label="Investigation notes and coaching">
+                <div class="coach-banner">
+                  <strong>Inspection progress</strong>
+                  <p>You have inspected <strong>${result.inspected.length}</strong> of ${scenario.targets.length} available elements. You need at least ${MIN_INSPECTIONS_REQUIRED} before submitting your analysis.</p>
+                </div>
+
+                <div class="coaching-card">
+                  <h3>Immediate coaching</h3>
+                  <p>${latestTarget ? escapeHtml(latestTarget.coaching) : "Select a clue in the email to see plain-language coaching about why it matters."}</p>
+                  <div class="coaching-callout">
+                    <strong>Keyboard tip</strong>
+                    Use <span class="kbd">Tab</span> to move through inspect buttons. Press <span class="kbd">Enter</span> or <span class="kbd">Space</span> to inspect a clue.
+                  </div>
+                </div>
+
+                <section aria-labelledby="clue-log-title">
+                  <h3 id="clue-log-title">Inspected elements</h3>
+                  <ul class="inspected-list">
+                    ${renderInspectedList(scenario, result)}
+                  </ul>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderDecisionScreen() {
+      const scenario = getScenario();
+      const result = getScenarioResult(scenario.id);
+
+      return `
+        <section class="screen app-layout" aria-labelledby="decision-title">
+          ${buildSidebar(state.currentScenarioIndex)}
+
+          <div class="content-area">
+            <div class="content-header">
+              <div>
+                <h2 id="decision-title" tabindex="-1" data-focus-target>Choose Your Response</h2>
+                <p>Based on the clues you reviewed, select the safest action. Use arrow keys to move between options, then press <span class="kbd">Enter</span> or <span class="kbd">Space</span> to confirm.</p>
+              </div>
+              <div class="footer-actions">
+                <button type="button" class="btn-secondary" data-action="back-to-detail">Back to investigation</button>
+              </div>
+            </div>
+
+            ${buildProgressBanner(`Decision point for email ${state.currentScenarioIndex + 1}`)}
+
+            <section class="decision-panel" aria-label="Decision choices">
+              <div class="chip-row">
+                <span class="badge">Inspected: ${result.inspected.length}</span>
+                <span class="badge">Suspicious clues found: ${result.suspiciousFound.length}</span>
+              </div>
+
+              <div class="decision-grid" role="radiogroup" aria-label="Available response actions">
+                ${ACTIONS.map((action, index) => {
+                  const selected = result.selectedAction === action.id;
+                  const isFirstSelectable = !result.selectedAction && index === 0;
+                  return `
+                    <button
+                      type="button"
+                      class="decision-card ${selected ? "selected" : ""}"
+                      role="radio"
+                      aria-checked="${selected ? "true" : "false"}"
+                      tabindex="${selected || isFirstSelectable ? "0" : "-1"}"
+                      data-action="select-decision"
+                      data-value="${action.id}"
+                    >
+                      <img class="decision-icon" src="${getActionIcon(action.id)}" alt="" aria-hidden="true">
+                      <div class="decision-copy">
+                        <strong>${escapeHtml(action.label)}</strong>
+                        <span>${escapeHtml(action.description)}</span>
+                      </div>
+                    </button>
+                  `;
+                }).join("")}
+              </div>
+
+              <div class="footer-actions">
+                <button
+                  type="button"
+                  class="btn-primary"
+                  data-action="submit-decision"
+                  ${result.selectedAction ? "" : "disabled"}
+                >
+                  Submit analysis
+                </button>
+              </div>
+            </section>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderFeedbackScreen() {
+      const scenario = getScenario();
+      const result = getScenarioResult(scenario.id);
+      const summary = buildClueSummary(result, scenario);
+      const action = ACTIONS.find((item) => item.id === result.selectedAction);
+      const quality = getActionQuality(result, scenario);
+      const suspiciousFound = summary.suspiciousTargets.filter((target) => result.suspiciousFound.includes(target.id));
+
+      return `
+        <section class="screen app-layout" aria-labelledby="feedback-title">
+          ${buildSidebar(state.currentScenarioIndex)}
+
+          <div class="content-area">
+            <div class="content-header">
+              <div>
+                <h2 id="feedback-title" tabindex="-1" data-focus-target>Coaching Feedback</h2>
+                <p>Review what you noticed, what you missed, and whether your final action matched the safest response for this scenario.</p>
+              </div>
+            </div>
+
+            ${buildProgressBanner(`Feedback for email ${state.currentScenarioIndex + 1}`)}
+
+            <section class="feedback-panel" aria-label="Feedback details">
+              <div class="summary-score">
+                <div class="score-card">
+                  <h4>Scenario score</h4>
+                  <div class="score-total">${result.clueScore + result.actionScore}</div>
+                </div>
+
+                <div class="feedback-card">
+                  <h4>Action selected</h4>
+                  <img class="feedback-badge" src="${getActionQualityBadge(result, scenario)}" alt="${escapeHtml(quality.title)} badge">
+                  <p><strong>${escapeHtml(action.label)}</strong><br><span class="${quality.toneClass}">${escapeHtml(quality.title)}</span><br>${escapeHtml(quality.detail)}</p>
+                </div>
+
+                <div class="feedback-card">
+                  <h4>Coach's readout</h4>
+                  <p>${escapeHtml(scenario.coachingSummary)}</p>
+                </div>
+              </div>
+
+              <div class="feedback-grid">
+                <article class="feedback-card">
+                  <h4>Suspicious clues found</h4>
+                  <ul class="feedback-list">
+                    ${suspiciousFound.length > 0
+                      ? suspiciousFound.map((target) => `<li><strong>${escapeHtml(target.label)}:</strong> ${escapeHtml(target.detail)}</li>`).join("")
+                      : "<li>You did not mark any of the suspicious clues built into this scenario.</li>"}
+                  </ul>
+                </article>
+
+                <article class="feedback-card">
+                  <h4>Missed clues</h4>
+                  <ul class="feedback-list">
+                    ${summary.missedTargets.length > 0
+                      ? summary.missedTargets.map((target) => `<li><strong>${escapeHtml(target.label)}:</strong> ${escapeHtml(target.coaching)}</li>`).join("")
+                      : "<li>You found every suspicious clue included in this scenario.</li>"}
+                  </ul>
+                </article>
+
+                <article class="feedback-card">
+                  <h4>Benign details you checked</h4>
+                  <ul class="feedback-list">
+                    ${summary.safeTargets.length > 0
+                      ? summary.safeTargets.map((target) => `<li><strong>${escapeHtml(target.label)}:</strong> ${escapeHtml(target.coaching)}</li>`).join("")
+                      : "<li>You focused mainly on red flags in this scenario, which is fine as long as you still weigh the full context.</li>"}
+                  </ul>
+                </article>
+              </div>
+
+              <div class="footer-actions">
+                ${state.currentScenarioIndex < SCENARIOS.length - 1
+                  ? `<button type="button" class="btn-primary" data-action="next-scenario">Continue to next email</button>`
+                  : `<button type="button" class="btn-primary" data-action="show-summary">View final summary</button>`}
+                <button type="button" class="btn-secondary" data-action="retry-scenario">Retry this scenario</button>
+              </div>
+            </section>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderSummaryScreen() {
+      const performance = getPerformanceBadge(state.score);
+      const band = performance.band;
+      const tipCards = getSummaryTipCards();
+
+      const scenarioSummaries = SCENARIOS.map((scenario) => {
+        const result = getScenarioResult(scenario.id);
+        return {
+          subject: scenario.subject,
+          score: result.clueScore + result.actionScore,
+          action: ACTIONS.find((item) => item.id === result.selectedAction)?.label || "No decision recorded"
+        };
+      });
+
+      return `
+        <section class="screen app-layout" aria-labelledby="summary-title">
+          ${buildSidebar(SCENARIOS.length - 1)}
+
+          <div class="content-area">
+            <div class="content-header">
+              <div>
+                <h2 id="summary-title" tabindex="-1" data-focus-target>Final Summary</h2>
+                <p>You completed all three scenarios. This wrap-up is designed to leave you with practical habits you can carry into a real inbox, especially when messages involve credentials, money, or pressure.</p>
+              </div>
+            </div>
+
+            ${buildProgressBanner("Training complete")}
+
+            <section class="summary-card" aria-label="Final results">
+              <img class="summary-hero" src="${getAssetPath("assets/completion-hero-640x360.svg")}" alt="Completion illustration for the Inbox Defender training module">
+              <div class="summary-score">
+                <div class="score-card">
+                  <h4>Total score</h4>
+                  <div class="score-total">${state.score}</div>
+                </div>
+
+                <div>
+                  <img class="performance-badge" src="${performance.path}" alt="${escapeHtml(band)} performance badge">
+                  <div class="performance-pill">${escapeHtml(band)}</div>
+                  <p class="score-note">Your score reflects both signal recognition and judgment. The strongest performers spot suspicious clusters of clues and choose a response that keeps credentials, devices, and payments out of harm's way.</p>
+                </div>
+
+                <div class="feedback-card">
+                  <h4>Best score on this device</h4>
+                  <img class="feedback-badge" src="${getAssetPath("assets/trophy-icon-64x64.svg")}" alt="" aria-hidden="true">
+                  <p><strong>${state.bestScore}</strong><br>${state.score >= state.bestScore ? "New personal best or tied best performance." : "Try again to beat your top score."}</p>
+                </div>
+              </div>
+
+              <div class="summary-grid">
+                <article class="feedback-card">
+                  <h4>Scenario breakdown</h4>
+                  <ul class="summary-list">
+                    ${scenarioSummaries.map((entry) => `
+                      <li>
+                        <strong>${escapeHtml(entry.subject)}</strong><br>
+                        Score: ${entry.score} | Action: ${escapeHtml(entry.action)}
+                      </li>
+                    `).join("")}
+                  </ul>
+                </article>
+
+                <article class="feedback-card">
+                  <h4>Practical anti-phishing tips</h4>
+                  <ul class="summary-list">
+                    <li>Check the full sender address, especially on IT, HR, payroll, and vendor messages.</li>
+                    <li>Hover or inspect before clicking any link tied to passwords, invoices, sign-ins, or file sharing.</li>
+                    <li>Be cautious when an email introduces urgency and asks you to bypass your usual verification steps.</li>
+                    <li>Treat any request to change payment details or approve financial activity as high-risk until confirmed through an established channel.</li>
+                    <li>If a message feels off, verify outside the email instead of replying directly to the sender.</li>
+                  </ul>
+                </article>
+              </div>
+
+              <div class="summary-grid">
+                ${tipCards.map((tip) => `
+                  <article class="tip-card">
+                    <div class="tip-card-header">
+                      <img class="tip-icon" src="${getAssetPath(tip.icon)}" alt="" aria-hidden="true">
+                      <h4>${escapeHtml(tip.title)}</h4>
+                    </div>
+                    <p>${escapeHtml(tip.body)}</p>
+                  </article>
+                `).join("")}
+              </div>
+
+              <div class="footer-actions">
+                <button type="button" class="btn-primary" data-action="restart">Restart training</button>
+                <button type="button" class="btn-secondary" data-action="review-inbox">Review inbox again</button>
+              </div>
+            </section>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderApp() {
+      const app = document.getElementById("app");
+      let html = "";
+
+      switch (state.screen) {
+        case "welcome":
+          html = renderWelcomeScreen();
+          break;
+        case "inbox":
+          html = renderInboxScreen();
+          break;
+        case "detail":
+          html = renderEmailDetailScreen();
+          break;
+        case "decision":
+          html = renderDecisionScreen();
+          break;
+        case "feedback":
+          html = renderFeedbackScreen();
+          break;
+        case "summary":
+          html = renderSummaryScreen();
+          break;
+        default:
+          html = renderWelcomeScreen();
+      }
+
+      app.innerHTML = html;
+      setTopBar();
+      focusAfterRender();
+    }
+
+    // ---------------------------------------------------------------------
+    // Scoring and navigation
+    // ---------------------------------------------------------------------
+    function scoreScenario(scenario, result) {
+      result.clueScore = result.suspiciousFound.length * SCORING.suspiciousClue;
+
+      let actionScore = 0;
+      if (result.selectedAction === scenario.safestAction) {
+        actionScore += SCORING.correctAction;
+      } else if (scenario.dangerousActions.includes(result.selectedAction)) {
+        actionScore += SCORING.dangerousActionPenalty;
+      }
+
+      result.actionScore = actionScore;
+    }
+
+    function recalculateTotalScore() {
+      state.score = SCENARIOS.reduce((total, scenario) => {
+        const result = getScenarioResult(scenario.id);
+        return total + result.clueScore + result.actionScore;
+      }, 0);
+      persistBestScore();
+    }
+
+    function startTraining() {
+      state.screen = "inbox";
+      state.currentScenarioIndex = 0;
+      state.preferredFocus = '[data-action="open-email"][data-index="0"]';
+      announce("Training started. Open the first email in the inbox.");
+      renderApp();
+    }
+
+    function openEmail(index) {
+      state.currentScenarioIndex = index;
+      state.screen = "detail";
+      state.preferredFocus = '[data-action="inspect-target"]';
+      announce(`Opened email: ${getScenario(index).subject}`);
+      renderApp();
+    }
+
+    function inspectTarget(targetId) {
+      const scenario = getScenario();
+      const result = getScenarioResult(scenario.id);
+      const target = scenario.targets.find((item) => item.id === targetId);
+
+      if (!target || result.inspected.includes(targetId)) {
+        return;
+      }
+
+      result.inspected.push(targetId);
+      result.lastInspectedId = targetId;
+
+      if (target.type === "suspicious" && !result.suspiciousFound.includes(targetId)) {
+        result.suspiciousFound.push(targetId);
+      }
+
+      if (target.type === "benign" && !result.benignInspected.includes(targetId)) {
+        result.benignInspected.push(targetId);
+      }
+
+      state.preferredFocus = `[data-action="inspect-target"][data-target-id="${targetId}"]`;
+      announce(`${target.label} inspected. ${target.coaching}`);
+      renderApp();
+    }
+
+    function selectDecision(actionId) {
+      const scenario = getScenario();
+      const result = getScenarioResult(scenario.id);
+      result.selectedAction = actionId;
+      state.preferredFocus = `[data-action="select-decision"][data-value="${actionId}"]`;
+      announce(`Decision selected: ${ACTIONS.find((action) => action.id === actionId).label}`);
+      renderApp();
+    }
+
+    function submitDecision() {
+      const scenario = getScenario();
+      const result = getScenarioResult(scenario.id);
+
+      if (result.inspected.length < MIN_INSPECTIONS_REQUIRED) {
+        announce(`Inspect at least ${MIN_INSPECTIONS_REQUIRED} elements before submitting.`);
+        return;
+      }
+
+      if (!result.selectedAction) {
+        announce("Choose an action before submitting your analysis.");
+        return;
+      }
+
+      scoreScenario(scenario, result);
+      result.feedbackViewed = true;
+      recalculateTotalScore();
+      state.screen = "feedback";
+      announce(`Feedback ready for ${scenario.subject}.`);
+      renderApp();
+    }
+
+    function nextScenario() {
+      state.currentScenarioIndex += 1;
+      state.screen = "inbox";
+      state.preferredFocus = `[data-action="open-email"][data-index="${state.currentScenarioIndex}"]`;
+      announce(`Moving to email ${state.currentScenarioIndex + 1}.`);
+      renderApp();
+    }
+
+    function showSummary() {
+      recalculateTotalScore();
+      state.screen = "summary";
+      announce(`Training complete. Final score ${state.score}. Performance band ${calculatePerformanceBand(state.score)}.`);
+      renderApp();
+    }
+
+    function resetScenario(index) {
+      const scenario = SCENARIOS[index];
+      state.results[scenario.id] = createEmptyResult();
+      recalculateTotalScore();
+    }
+
+    function restartTraining() {
+      state.screen = "welcome";
+      state.currentScenarioIndex = 0;
+      state.score = 0;
+      state.results = {};
+      state.preferredFocus = null;
+      announce("Training restarted.");
+      renderApp();
+    }
+
+    // ---------------------------------------------------------------------
+    // Event handling
+    // ---------------------------------------------------------------------
+    document.addEventListener("click", (event) => {
+      const target = event.target.closest("[data-action]");
+      if (!target) return;
+
+      const action = target.dataset.action;
+
+      switch (action) {
+        case "start-training":
+          startTraining();
+          break;
+        case "open-email":
+          openEmail(Number(target.dataset.index));
+          break;
+        case "back-to-inbox":
+          state.screen = "inbox";
+          state.preferredFocus = `[data-action="open-email"][data-index="${state.currentScenarioIndex}"]`;
+          announce("Returned to the inbox.");
+          renderApp();
+          break;
+        case "inspect-target":
+          inspectTarget(target.dataset.targetId);
+          break;
+        case "go-to-decision":
+          state.screen = "decision";
+          state.preferredFocus = '[data-action="select-decision"][tabindex="0"]';
+          announce("Choose the safest action for this email.");
+          renderApp();
+          break;
+        case "back-to-detail":
+          state.screen = "detail";
+          state.preferredFocus = '[data-action="inspect-target"]';
+          announce("Returned to the email investigation view.");
+          renderApp();
+          break;
+        case "select-decision":
+          selectDecision(target.dataset.value);
+          break;
+        case "submit-decision":
+          submitDecision();
+          break;
+        case "next-scenario":
+          nextScenario();
+          break;
+        case "show-summary":
+          showSummary();
+          break;
+        case "retry-scenario":
+          resetScenario(state.currentScenarioIndex);
+          state.screen = "detail";
+          state.preferredFocus = '[data-action="inspect-target"]';
+          announce("Scenario reset. Reinspect the email and choose again.");
+          renderApp();
+          break;
+        case "restart":
+          restartTraining();
+          break;
+        case "review-inbox":
+          state.screen = "inbox";
+          state.preferredFocus = `[data-action="open-email"][data-index="${state.currentScenarioIndex}"]`;
+          announce("Returned to the inbox for review.");
+          renderApp();
+          break;
+        case "jump-scenario": {
+          const targetIndex = Number(target.dataset.index);
+          state.currentScenarioIndex = targetIndex;
+          state.screen = isScenarioComplete(targetIndex) ? "feedback" : "detail";
+          state.preferredFocus = state.screen === "feedback"
+            ? '[data-action="retry-scenario"], [data-action="next-scenario"], [data-action="show-summary"]'
+            : '[data-action="inspect-target"]';
+          announce(`Opened scenario ${targetIndex + 1}.`);
+          renderApp();
+          break;
+        }
+      }
+    });
+
+    // Arrow-key support for the response choices. This creates a better
+    // keyboard experience than forcing users to tab across every option.
+    document.addEventListener("keydown", (event) => {
+      if (state.screen !== "decision") return;
+
+      const decisionCards = Array.from(document.querySelectorAll('[data-action="select-decision"]'));
+      if (!decisionCards.length) return;
+
+      const result = getScenarioResult(getScenario().id);
+      const currentIndex = Math.max(0, ACTIONS.findIndex((action) => action.id === result.selectedAction));
+
+      let targetIndex = null;
+
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        targetIndex = currentIndex < ACTIONS.length - 1 ? currentIndex + 1 : 0;
+      }
+
+      if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        targetIndex = currentIndex > 0 ? currentIndex - 1 : ACTIONS.length - 1;
+      }
+
+      if (event.key === "Home") {
+        targetIndex = 0;
+      }
+
+      if (event.key === "End") {
+        targetIndex = ACTIONS.length - 1;
+      }
+
+      if (targetIndex !== null) {
+        event.preventDefault();
+        selectDecision(ACTIONS[targetIndex].id);
+      }
+    });
+
+    // ---------------------------------------------------------------------
+    // Bootstrap
+    // ---------------------------------------------------------------------
+    state.bestScore = getBestScore();
+    renderApp();
+  </script>
+</body>
+</html>
