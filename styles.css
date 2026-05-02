@@ -730,6 +730,11 @@ p {
   font-size: 0.9rem;
 }
 
+.contact-value {
+  color: var(--ink);
+  font-weight: 500;
+}
+
 .course-lightbox {
   position: fixed;
   inset: 0;
