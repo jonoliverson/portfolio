@@ -23,6 +23,53 @@ if ("IntersectionObserver" in window && revealItems.length > 0) {
   revealItems.forEach((item) => item.classList.add("is-visible"));
 }
 
+const siteHeader = document.querySelector(".site-header");
+
+const getHeaderOffset = () => {
+  if (!siteHeader) {
+    return 0;
+  }
+
+  const headerRect = siteHeader.getBoundingClientRect();
+  const headerStyles = window.getComputedStyle(siteHeader);
+  const stickyTop = Number.parseFloat(headerStyles.top) || 0;
+
+  return headerRect.height + stickyTop + 20;
+};
+
+const alignHashTarget = (behavior = "auto") => {
+  if (!window.location.hash) {
+    return;
+  }
+
+  const target = document.querySelector(window.location.hash);
+  if (!target) {
+    return;
+  }
+
+  const targetTop = target.getBoundingClientRect().top + window.scrollY;
+  const scrollTop = Math.max(targetTop - getHeaderOffset(), 0);
+
+  window.scrollTo({
+    top: scrollTop,
+    behavior,
+  });
+};
+
+window.addEventListener("load", () => {
+  if (!window.location.hash) {
+    return;
+  }
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => alignHashTarget());
+  });
+});
+
+window.addEventListener("hashchange", () => {
+  alignHashTarget("smooth");
+});
+
 const form = document.querySelector(".contact-form");
 
 form?.addEventListener("submit", (event) => {
