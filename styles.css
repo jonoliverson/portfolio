@@ -437,6 +437,11 @@ p {
   font-size: 0.8rem;
 }
 
+.case-study-launch {
+  width: 100%;
+  margin-top: 0.9rem;
+}
+
 .card {
   padding: 1rem;
   border-radius: var(--radius-lg);

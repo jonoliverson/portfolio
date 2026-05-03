@@ -90,7 +90,9 @@ form?.addEventListener("submit", (event) => {
 const lightbox = document.querySelector("#course-lightbox");
 const lightboxFrame = document.querySelector("#course-lightbox-frame");
 const lightboxTitle = document.querySelector("#course-lightbox-title");
-const projectOpenButtons = document.querySelectorAll(".project-open[data-course-src]");
+const projectOpenButtons = document.querySelectorAll(
+  "[data-course-src][data-course-title]"
+);
 const lightboxCloseControls = document.querySelectorAll("[data-lightbox-close]");
 
 const openCourseLightbox = (src, title) => {
