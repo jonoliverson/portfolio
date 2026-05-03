@@ -16,6 +16,7 @@
   --radius-lg: 18px;
   --radius-md: 12px;
   --radius-sm: 8px;
+  --anchor-offset: 7rem;
 }
 
 * {
@@ -24,6 +25,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--anchor-offset);
 }
 
 body {
@@ -356,6 +358,7 @@ p {
   box-shadow: var(--shadow);
   border-radius: var(--radius-lg);
   padding: 1.1rem;
+  scroll-margin-top: var(--anchor-offset);
 }
 
 .case-study-header {
