@@ -13,7 +13,7 @@
         <options>
           <option name="title_enabled" value="false">
             <options>
-              <option name="title_text" value="Customer Service Call Simulation" />
+              <option name="title_text" value="Customer Service Call Simulation - V2" />
             </options>
           </option>
           <option name="logo_enabled" value="false">
@@ -77,7 +77,7 @@
       </optiongroup>
       <optiongroup name="bottombaroptions">
         <options>
-          <option name="bottombar_enabled" value="true" />
+          <option name="bottombar_enabled" value="false" />
         </options>
       </optiongroup>
       <optiongroup name="buttonoptions">
