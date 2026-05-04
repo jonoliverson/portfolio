@@ -72,19 +72,58 @@ window.addEventListener("hashchange", () => {
 
 const form = document.querySelector(".contact-form");
 
-form?.addEventListener("submit", (event) => {
+form?.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const button = form.querySelector("button");
-  const originalLabel = button.textContent;
 
-  button.textContent = "Inquiry sent";
+  const button = form.querySelector("button");
+  const status = form.querySelector(".form-status");
+
+  if (!button) {
+    return;
+  }
+
+  const originalLabel = button.textContent;
+  const formData = new FormData(form);
+
+  button.textContent = "Sending...";
   button.disabled = true;
 
-  setTimeout(() => {
+  if (status) {
+    status.textContent = "";
+    status.classList.remove("is-error", "is-success");
+  }
+
+  try {
+    const response = await fetch(form.action, {
+      method: form.method,
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || result.success !== true) {
+      throw new Error(result.message || "Unable to send inquiry.");
+    }
+
+    if (status) {
+      status.textContent =
+        "Inquiry sent successfully. Thank you for reaching out.";
+      status.classList.add("is-success");
+    }
+
+    form.reset();
+  } catch (error) {
+    if (status) {
+      status.textContent =
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.";
+      status.classList.add("is-error");
+    }
+  } finally {
     button.textContent = originalLabel;
     button.disabled = false;
-    form.reset();
-  }, 1800);
+  }
 });
 
 const lightbox = document.querySelector("#course-lightbox");

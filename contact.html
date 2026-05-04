@@ -46,26 +46,64 @@
                 <p><strong>Phone:</strong> <span class="contact-value">602-402-9618</span></p>
               </div>
             </div>
-            <form class="contact-form">
+            <form
+              class="contact-form"
+              action="https://api.web3forms.com/submit"
+              method="POST"
+            >
+              <input
+                type="hidden"
+                name="access_key"
+                value="3f4465e2-b9f9-4d35-828b-613c5cf486d6"
+              />
+              <input
+                type="hidden"
+                name="subject"
+                value="New portfolio contact inquiry"
+              />
+              <input
+                type="hidden"
+                name="from_name"
+                value="Jonathan Oliverson Portfolio"
+              />
+              <input
+                type="checkbox"
+                name="botcheck"
+                class="contact-honeypot"
+                tabindex="-1"
+                autocomplete="off"
+              />
               <label>
                 Name
-                <input type="text" name="name" placeholder="Avery Chen" />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Avery Chen"
+                  required
+                />
               </label>
               <label>
                 Email
-                <input type="email" name="email" placeholder="avery@company.com" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="avery@company.com"
+                  required
+                />
               </label>
               <label>
                 Message
                 <textarea
-                  name="brief"
+                  name="message"
                   rows="4"
                   placeholder="I’d love to discuss an instructional design or training opportunity with your team."
+                  required
                 ></textarea>
               </label>
               <button class="button button-primary" type="submit">
                 Send inquiry
               </button>
+              <p class="form-status" aria-live="polite"></p>
             </form>
           </div>
         </section>
