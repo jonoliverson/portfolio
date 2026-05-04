@@ -107,6 +107,16 @@ const openCourseLightbox = (src, title) => {
   document.body.classList.add("lightbox-open");
 };
 
+const resetLightboxFrame = () => {
+  if (!lightboxFrame) {
+    return;
+  }
+
+  // Force the embedded course to unload so any active audio stops immediately.
+  lightboxFrame.src = "about:blank";
+  lightboxFrame.removeAttribute("src");
+};
+
 const closeCourseLightbox = () => {
   if (!lightbox || !lightboxFrame) {
     return;
@@ -114,7 +124,7 @@ const closeCourseLightbox = () => {
 
   lightbox.classList.remove("is-open");
   lightbox.setAttribute("aria-hidden", "true");
-  lightboxFrame.src = "";
+  resetLightboxFrame();
   document.body.classList.remove("lightbox-open");
 };
 
