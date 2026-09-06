@@ -45,7 +45,13 @@ const alignHashTarget = (behavior = "auto") => {
     return;
   }
 
-  const target = document.querySelector(window.location.hash);
+  let targetId;
+  try {
+    targetId = decodeURIComponent(window.location.hash.slice(1));
+  } catch {
+    return;
+  }
+  const target = document.getElementById(targetId);
   if (!target) {
     return;
   }
@@ -138,16 +144,20 @@ const projectOpenButtons = document.querySelectorAll(
   "[data-course-src][data-course-title]"
 );
 const lightboxCloseControls = document.querySelectorAll("[data-lightbox-close]");
+let previewTrigger = null;
 
-const openCourseLightbox = (src, title) => {
+const openCourseLightbox = (src, title, trigger) => {
   if (!lightbox || !lightboxFrame || !lightboxTitle) {
     return;
   }
 
-  lightboxFrame.src = src;
+  previewTrigger = trigger || document.activeElement;
   lightboxTitle.textContent = title || "Course Preview";
   lightbox.classList.add("is-open");
   lightbox.setAttribute("aria-hidden", "false");
+  lightbox.showModal();
+  lightbox.querySelector(".lightbox-close").focus({ preventScroll: true });
+  lightboxFrame.src = src;
   document.body.classList.add("lightbox-open");
 };
 
@@ -162,15 +172,27 @@ const resetLightboxFrame = () => {
 };
 
 const closeCourseLightbox = () => {
-  if (!lightbox || !lightboxFrame) {
+  if (!lightbox || !lightboxFrame || !lightbox.open) {
     return;
   }
 
+  lightbox.close();
   lightbox.classList.remove("is-open");
   lightbox.setAttribute("aria-hidden", "true");
   resetLightboxFrame();
   document.body.classList.remove("lightbox-open");
+  if (previewTrigger?.isConnected) {
+    previewTrigger.focus({ preventScroll: true });
+  }
+  previewTrigger = null;
 };
+
+// Native modal dialogs contain focus and make the rest of the page inert,
+// including while keyboard navigation enters or leaves an embedded course.
+lightbox?.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  closeCourseLightbox();
+});
 
 projectOpenButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -179,7 +201,7 @@ projectOpenButtons.forEach((button) => {
     if (!src) {
       return;
     }
-    openCourseLightbox(src, title);
+    openCourseLightbox(src, title, button);
   });
 });
 

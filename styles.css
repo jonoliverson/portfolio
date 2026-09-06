@@ -75,6 +75,31 @@ select {
   outline-offset: 3px;
 }
 
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 1rem;
+  z-index: 200;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  color: var(--accent-deep);
+  border-radius: var(--radius-control);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.competency-heading {
+  font-size: 1.125rem;
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: normal;
+  max-width: none;
+  margin: var(--space-1) 0 var(--space-3);
+}
+
 .page-shell {
   width: min(1040px, calc(100% - 2rem));
   margin: 0 auto;
@@ -647,7 +672,7 @@ p {
 .project-open {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: none;
   width: 100%;
   min-width: 0;
   min-height: var(--control-min);
@@ -677,6 +702,7 @@ p {
 }
 
 .project-frame {
+  display: block;
   width: 100%;
   padding: var(--space-3) var(--space-3) 0;
   background: transparent;
@@ -729,6 +755,7 @@ p {
 }
 
 .project-frame-preview {
+  display: block;
   position: relative;
 }
 
@@ -797,7 +824,7 @@ p {
 }
 
 .project-copy p,
-.project-copy h3,
+.project-copy h2,
 .project-copy ul {
   margin: 0;
 }
@@ -807,7 +834,8 @@ p {
   outline-offset: 3px;
 }
 
-.project-copy h3 {
+.project-copy h2 {
+  max-width: none;
   font-size: clamp(1.375rem, 1.1rem + 0.8vw, 1.75rem);
   font-weight: 700;
   line-height: 1.25;
@@ -974,8 +1002,21 @@ p {
 .course-lightbox {
   position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
   z-index: 100;
   display: none;
+}
+
+.course-lightbox::backdrop {
+  background: transparent;
 }
 
 .course-lightbox.is-open {
