@@ -598,17 +598,15 @@ p {
 
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-8) var(--space-6);
 }
 
 .project-card {
   display: flex;
   flex-direction: column;
   border-radius: var(--radius-lg);
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  height: 100%;
+  min-width: 0;
 }
 
 .project-open {
@@ -616,6 +614,9 @@ p {
   flex-direction: column;
   flex: 1;
   width: 100%;
+  min-width: 0;
+  min-height: var(--control-min);
+  border-radius: var(--radius-panel);
   border: 0;
   padding: 0;
   background: transparent;
@@ -630,18 +631,24 @@ p {
 }
 
 .project-footer {
-  padding: 0 1rem 1rem;
+  padding: 0 var(--space-6) var(--space-6);
   margin-top: auto;
 }
 
 .project-case-link {
-  width: 100%;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .project-frame {
-  padding: 0.8rem;
-  background: linear-gradient(180deg, #f8fafc, #f1f5f8);
-  border-bottom: 1px solid var(--line);
+  width: 100%;
+  padding: var(--space-3) var(--space-3) 0;
+  background: transparent;
+}
+
+.project-card .frame-chrome {
+  display: none;
 }
 
 .frame-chrome {
@@ -705,18 +712,25 @@ p {
 }
 
 .project-launch-hint {
-  position: absolute;
-  right: 0.7rem;
-  bottom: 0.7rem;
   display: inline-flex;
   align-items: center;
-  border-radius: 6px;
-  padding: 0.3rem 0.5rem;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.94);
+  min-height: var(--control-min);
+  max-width: 100%;
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--highlight);
   color: var(--deep-teal);
-  font-size: 0.72rem;
+  font-size: var(--font-small);
+  line-height: 1.5;
   font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.project-open:hover .project-launch-hint,
+.project-open:focus-visible .project-launch-hint {
+  background: var(--accent-deep);
+  color: var(--surface);
 }
 
 .frame-canvas p,
@@ -738,9 +752,11 @@ p {
 }
 
 .project-copy {
-  padding: 0.95rem 1rem;
+  padding: var(--space-4) var(--space-6) var(--space-6);
+  width: 100%;
+  min-width: 0;
   display: grid;
-  gap: 0.45rem;
+  gap: var(--space-3);
   flex: 1;
   align-content: start;
 }
@@ -752,9 +768,19 @@ p {
 }
 
 .project-open:focus-visible {
-  /* Keep the ring inside the existing card's clipped preview surface. */
   outline: 3px solid var(--focus);
-  outline-offset: -6px;
+  outline-offset: 3px;
+}
+
+.project-copy h3 {
+  font-size: clamp(1.375rem, 1.1rem + 0.8vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.project-copy .project-meta {
+  margin-top: var(--space-2);
 }
 
 .project-meta {
@@ -763,14 +789,16 @@ p {
   margin: 0.5rem 0 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: var(--space-2);
 }
 
 .project-meta li {
-  padding: 0.35rem 0.55rem;
+  padding: var(--space-1) 0.625rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   border-radius: 999px;
-  background: #f5f8fa;
-  border: 1px solid var(--line);
+  background: var(--bg);
   color: var(--muted);
   font-size: var(--font-small);
   font-weight: 500;
@@ -988,13 +1016,31 @@ body.lightbox-open {
   .hero,
   .contact-panel,
   .cards,
-  .project-grid,
   .case-study-grid {
     grid-template-columns: 1fr;
   }
 
   .hero-metrics {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 48rem) {
+  .project-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+
+  .project-copy {
+    padding: var(--space-4);
+  }
+
+  .project-footer {
+    padding: 0 var(--space-4) var(--space-4);
+  }
+
+  .project-case-link {
+    width: 100%;
   }
 }
 
@@ -1036,8 +1082,6 @@ body.lightbox-open {
   .contact-panel,
   .card,
   .hero-panel,
-  .project-copy,
-  .project-frame,
   .case-study,
   .case-study-section,
   .case-study-panel {
