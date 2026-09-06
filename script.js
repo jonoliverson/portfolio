@@ -32,6 +32,9 @@ const getHeaderOffset = () => {
 
   const headerRect = siteHeader.getBoundingClientRect();
   const headerStyles = window.getComputedStyle(siteHeader);
+  if (headerStyles.position !== "sticky" && headerStyles.position !== "fixed") {
+    return 16;
+  }
   const stickyTop = Number.parseFloat(headerStyles.top) || 0;
 
   return headerRect.height + stickyTop + 20;
