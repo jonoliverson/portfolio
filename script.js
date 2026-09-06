@@ -52,7 +52,9 @@ const alignHashTarget = (behavior = "auto") => {
 
   window.scrollTo({
     top: scrollTop,
-    behavior,
+    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "instant"
+      : behavior,
   });
 };
 
