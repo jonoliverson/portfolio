@@ -1,6 +1,16 @@
 # Proposed portfolio design specification
 
-Status: proposal for review; this document does not authorize application changes. Updated September 6, 2026. Values are recommended starting points for later implementation and browser validation.
+Status: design specification with implementation status recorded below. Updated September 6, 2026. The scoped implementation passes were authorized separately; this document does not authorize additional changes. Values remain subject to browser validation.
+
+**Final consistency pass — implementation status**
+
+- Resolved: native controls inherit Outfit; paragraph rules no longer override experience company/date/label colors; header corners stay 12px on mobile; project and case-study chips share padding, gap, typography, and surface; the availability dot is static accent blue.
+- Resolved in this pass: Contact and Resume both offer an underlined email link with identical displayed text. Contact fields and detail panels use the spacing scale, readable text, stronger control boundaries, and wrapping content. Close uses the standard button radius, padding, contrast, and minimum 44px target. Current-page styling also recognizes `aria-current="page"` directly.
+- Navigation audit: Home, About, Portfolio, Resume, and Contact each correctly mark their own page. Case Studies has no matching top-level link, so no existing link is falsely marked as its current page. Adding a Case Studies item or a distinct parent-section indicator remains a separate navigation decision; this pass preserves the existing navigation structure.
+- Footer audit: none of the six top-level pages contains a site-wide footer. No footer or new content was introduced. Project-card footers remain unchanged.
+- Reduced-motion CSS and JavaScript anchor behavior are implemented; content is visible without reveal animation. The older gap statement below is historical for motion. Modal focus placement, containment, and restoration remain a separate functional accessibility task; this pass does not change preview behavior.
+- Completed hero, gallery, case-study layouts, routes, project content, and preview handlers are preserved. The existing 1040px shell and unrelated section spacing remain rather than applying a wider redesign during this pass.
+- Validation: source-level preservation checks are required for this pass. Browser rendering, keyboard traversal, zoom/reflow, and embedded-course behavior still require visual/interactive verification; this is not an accessibility conformance claim.
 
 ## Visual direction
 
@@ -221,4 +231,4 @@ Source review of the six top-level HTML pages and `styles.css`, dated September 
 | Project metadata pills | `.case-study-tags li` uses padding `0.36rem 0.56rem` with a `0.45rem` container gap; `.project-meta li` uses `0.35rem 0.55rem` with a `0.4rem` gap (`styles.css:431` and `styles.css:671`). Both use the same pill shape, background, border, and font size. | Whether these small spacing differences between project metadata components are intentional. |
 | Status animation color | The home status dot uses the accent color and an initial shadow based on RGB `33, 91, 143` (`styles.css:274`). Its `pulse` animation uses brighter RGB `30, 168, 245` (`styles.css:874`). | Whether the pulse should intentionally differ from the dot's base accent. |
 
-The table preserves the original observations and questions. Proposed treatments now appear in the relevant specification sections above; no application fixes have been made. Case Studies navigation identity remains open. Source line numbers refer to the original audit and should be rechecked during implementation. Responsive and component differences may have been intentional; the proposal does not retroactively classify every variation as a defect.
+The table preserves historical observations and questions, not current unresolved defects. Refer to the implementation status at the top for resolved items and intentional deferrals. Source line numbers refer to the original audit. Responsive and component differences may have been intentional; this specification does not retroactively classify every variation as a defect.

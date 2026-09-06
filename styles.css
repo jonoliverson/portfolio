@@ -135,7 +135,8 @@ select {
   border-radius: var(--radius-control);
 }
 
-.nav a.active {
+.nav a.active,
+.nav a[aria-current="page"] {
   color: var(--deep-teal);
   font-weight: 600;
   text-decoration: underline;
@@ -259,6 +260,9 @@ p {
   justify-content: center;
   border-radius: var(--radius-control);
   min-height: var(--control-min);
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
   padding: var(--space-3) var(--space-4);
   text-decoration: none;
   font-weight: 600;
@@ -846,15 +850,29 @@ p {
 
 .contact-panel {
   display: grid;
-  grid-template-columns: 0.95fr 1.05fr;
-  gap: 1rem;
-  padding: 1rem;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: var(--space-8);
+  padding: var(--space-6);
   border-radius: var(--radius-panel);
+}
+
+.contact-panel > * {
+  min-width: 0;
+}
+
+.contact-panel .eyebrow {
+  margin-top: 0;
+  margin-bottom: var(--space-3);
+}
+
+.contact-panel > div > p:last-child {
+  margin-bottom: 0;
 }
 
 .contact-form {
   display: grid;
-  gap: 0.7rem;
+  gap: var(--space-4);
+  align-content: start;
 }
 
 .contact-honeypot {
@@ -864,8 +882,9 @@ p {
 
 .contact-form label {
   display: grid;
-  gap: 0.35rem;
-  font-size: 0.9rem;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: var(--font-body);
   font-weight: 500;
 }
 
@@ -874,10 +893,26 @@ p {
   width: 100%;
   border: 1px solid var(--line-control);
   border-radius: var(--radius-sm);
-  padding: 0.8rem 0.9rem;
+  padding: var(--space-3) var(--space-4);
   font: inherit;
   color: var(--ink);
   background: #ffffff;
+}
+
+.contact-form input:not([type="hidden"]):not([type="checkbox"]),
+.contact-form textarea {
+  min-height: var(--control-min);
+  min-width: 0;
+}
+
+.contact-form textarea {
+  resize: vertical;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: var(--muted);
+  opacity: 1;
 }
 
 .contact-form input:focus,
@@ -890,7 +925,7 @@ p {
 .form-status {
   min-height: 1.4rem;
   margin: 0;
-  font-size: 0.88rem;
+  font-size: var(--font-small);
   color: var(--muted);
 }
 
@@ -904,18 +939,31 @@ p {
 
 .resume-list {
   display: grid;
-  gap: 0.6rem;
+  gap: var(--space-3);
+  min-width: 0;
   align-content: start;
 }
 
 .resume-list p {
   margin: 0;
-  padding: 0.7rem 0.8rem;
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
   border: 1px solid var(--line);
-  background: #fbfcfd;
+  background: var(--bg);
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: var(--font-body);
+}
+
+.resume-list a:not(.button) {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+
+.resume-list a:not(.button):hover {
+  color: var(--accent-deep);
 }
 
 .contact-value {
@@ -977,14 +1025,21 @@ p {
 }
 
 .lightbox-close {
-  border: 1px solid var(--line);
-  background: #ffffff;
+  border: 1px solid var(--line-control);
+  background: var(--surface);
   color: var(--deep-teal);
-  border-radius: 8px;
-  padding: 0.5rem 0.8rem;
+  border-radius: var(--radius-control);
+  padding: var(--space-3) var(--space-4);
+  min-height: var(--control-min);
+  min-width: var(--control-min);
   font: inherit;
   font-weight: 600;
+  line-height: 1.25;
   cursor: pointer;
+}
+
+.lightbox-close:hover {
+  background: var(--highlight);
 }
 
 .course-lightbox-body {
